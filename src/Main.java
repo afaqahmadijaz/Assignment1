@@ -31,10 +31,10 @@ public class Main {
             case 1:
                 System.out.println("\n***FOR INPATIENT STAY CHARGES***");
                 // Collect inpatient data
-                double ipHospitalDaysSpent = inputValidation(input, "Please enter the number of days spent in the Hospital: ");
-                double ipDailyRate = inputValidation(input, "Daily rate (room charges per day): ");
-                double ipHospitalServiceCharges = inputValidation(input, "Charges for the hospital services i.e labs tests, etc: ");
-                double ipHospitalMedicationCharges = inputValidation(input, "Hospital medication charges: ");
+                int ipHospitalDaysSpent = (int) inputValidation(input, "Please enter the number of days spent in the hospital (integer): ", true);
+                double ipDailyRate = inputValidation(input, "Daily rate (room charges per day): ", false);
+                double ipHospitalServiceCharges = inputValidation(input, "Charges for the hospital services i.e labs tests, etc: ", false);
+                double ipHospitalMedicationCharges = inputValidation(input, "Hospital medication charges: ", false);
 
                 double iptotal = calculateCharges(ipHospitalDaysSpent, ipDailyRate, ipHospitalServiceCharges, ipHospitalMedicationCharges);
                 System.out.printf("\nTotal inpatient charges: $%.2f%n", iptotal);
@@ -44,9 +44,9 @@ public class Main {
             case 2:
                 System.out.println("\n***FOR OUTPATIENT STAY CHARGES***");
 
-                // Calculate and display inpatient charges
-                double opHospitalServiceCharges = inputValidation(input, "Charges for the hospital services i.e labs tests, etc: ");
-                double opHospitalMedicationCharges = inputValidation(input,"Hospital medication charges: ");
+                // Calculate outpatient charges
+                double opHospitalServiceCharges = inputValidation(input, "Charges for the hospital services i.e labs tests, etc: ", false);
+                double opHospitalMedicationCharges = inputValidation(input,"Hospital medication charges: ", false);
 
                 double optotal = calculateCharges(opHospitalServiceCharges, opHospitalMedicationCharges);
                 System.out.printf("\nTotal outpatient charges: $%.2f%n", optotal);
@@ -55,39 +55,45 @@ public class Main {
         }
         input.close();
     }
-    public static double inputValidation (Scanner input, String prompt) {
+    public static double inputValidation (Scanner input, String prompt, boolean requireInteger) {
         while(true) {
             System.out.print(prompt);
 
-            if (input.hasNextDouble()) {
-                double value = input.nextDouble();
-                if (value < 0) {
-                    System.out.println("\n!!!Value cannot be negative. Try again.!!!");
+            if (requireInteger) {
+                if (input.hasNextInt()) {
+                    int value = input.nextInt();
+                    if (value < 0) {
+                        System.out.println("\n!!!Value cannot be negative. Try again.!!!");
+                    } else {
+                        return value; // returned as double for shared use
+                    }
+                } else {
+                    System.out.println("Invalid integer. Try again.");
+                    input.next();
+                }
+            } else {
+                if (input.hasNextDouble()) {
+                    double value = input.nextDouble();
+                    if (value < 0) {
+                        System.out.println("\n!!!Value cannot be negative. Try again.!!!");
+                    }
+                    else {
+                        return value;
+                    }
                 }
                 else {
-                    return value;
+                    System.out.println("Invalid number. Try again.");
+                    input.next();
                 }
-            }
-            else {
-                System.out.println("Invalid number. Try again.");
-                input.next();
             }
         }
     }
 
-    public static double calculateCharges (double days, double dailyRate, double services, double meds){
-        double ipCharges = 0;
-
-            ipCharges = (days * dailyRate) + services + meds;
-
-        return ipCharges;
+    public static double calculateCharges (int days, double dailyRate, double services, double meds){
+        return days * dailyRate + services + meds;
     }
 
     public static double calculateCharges (double services, double meds){
-        double opCharges = 0;
-
-        opCharges = services + meds;
-
-        return opCharges;
+        return services + meds;
     }
 }
